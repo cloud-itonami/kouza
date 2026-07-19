@@ -1,0 +1,49 @@
+{
+  "@context": "https://etzhayyim.com/ns/kotodama/v1",
+  "@id": "did:web:kouza.etzhayyim.com",
+  "name": "kouza-core-k0uz401",
+  "nanoid": "k0uz401",
+  "handle": "kouza.etzhayyim.com",
+  "project": "kouza",
+  "runtimeType": "worker",
+  "performerType": "service",
+  "component": {
+    "path": "src/app.ts"
+  },
+  "build": {
+    "role": "thin-edge",
+    "businessLogic": "40-engine/kotoba/crates/kotoba-kotodama/py/src/kotodama/ingest/kouza.py",
+    "bpmn": "etzhayyim-root/00-contracts/bpmn/com/etzhayyim/kouza"
+  },
+  "convoSystemPrompt": "You are the kouza financial account aggregation agent. You only perform read-only account, statement, and document import. Never initiate payments, transfers, withdrawals, FX, or securities orders.",
+  "governance": {
+    "raci": "responsible",
+    "classification": "pii-tier3",
+    "complianceFrameworks": ["read-only-financial-aggregation", "vault-secrets", "kaikei-derive"]
+  },
+  "profile": {
+    "displayName": "口座 kouza",
+    "description": "Read-only financial account aggregator for bank, securities, card, custody, and statement documents.",
+    "isBot": true,
+    "operator": "etzhayyim.com",
+    "agentType": "autonomous",
+    "capabilities": ["bpmn-dispatch", "connection-registry", "statement-import", "account-documents", "kaikei-bank-transaction-candidates"]
+  },
+  "triggers": {
+    "subscribeRepos": {
+      "collections": [
+        "com.etzhayyim.apps.kouza.institutionConnection",
+        "com.etzhayyim.apps.kouza.financialAccount",
+        "com.etzhayyim.apps.kouza.externalTransaction",
+        "com.etzhayyim.apps.kouza.accountDocument",
+        "com.etzhayyim.apps.kouza.syncRun"
+      ]
+    }
+  },
+  "space": {
+    "name": "口座 kouza",
+    "joinRule": "invite",
+    "channels": [{ "name": "kouza-core", "kind": "private", "default": true }]
+  },
+  "uiType": "appview"
+}
