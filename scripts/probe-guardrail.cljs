@@ -1,0 +1,82 @@
+;; Operator diagnostic: demonstrate that the kouza edge facade forwards ONLY
+;; `com.etzhayyim.apps.kouza.*` and refuses everything else.
+;;
+;; kouza is a read-only financial aggregator. Its containment boundary is the
+;; NSID prefix check in `appview/kouza-core-k0uz401/src/app.ts`. A boundary that
+;; is only asserted in prose is not a boundary, so this exercises the real
+;; module and prints what it actually answered.
+;;
+;;   nbb scripts/probe-guardrail.cljs
+;;
+;; Exits 1 if any refusal case was NOT refused. Requires Node >= 22 (imports the
+;; TypeScript module directly via native type stripping); no install step.
+
+(ns probe-guardrail
+  (:require [clojure.string :as str]))
+
+(def app-path
+  (str (.cwd js/process) "/appview/kouza-core-k0uz401/src/app.ts"))
+
+;; :forward — inside the kouza prefix, must be proxied upstream. With the
+;;   upstream absent this surfaces as a thrown fetch error, which still proves
+;;   the facade tried to forward rather than refusing.
+;; :refuse  — outside the prefix, must be 404. `kaikei.transfer` and
+;;   `evil.withdraw` are the cases that matter: money-moving shapes.
+(def cases
+  [{:method "GET"  :url "https://kouza.example/health"
+    :expect :ok       :note "health, no upstream needed"}
+   {:method "POST" :url "https://kouza.example/xrpc/com.etzhayyim.apps.kouza.financialAccount"
+    :expect :forward  :note "in-prefix read method"}
+   {:method "POST" :url "https://kouza.example/xrpc/com.etzhayyim.apps.kaikei.transfer"
+    :expect :refuse   :note "sibling app, money-moving verb"}
+   {:method "POST" :url "https://kouza.example/xrpc/com.example.evil.withdraw"
+    :expect :refuse   :note "foreign NSID, money-moving verb"}
+   {:method "GET"  :url "https://kouza.example/"
+    :expect :refuse   :note "unrouted path"}])
+
+(defn- path-of [u] (.-pathname (js/URL. u)))
+
+(defn- verdict
+  "Did the observed outcome satisfy what this case demanded?"
+  [{:keys [expect]} status threw?]
+  (case expect
+    :ok      (= status 200)
+    :refuse  (= status 404)
+    ;; forwarding is proven either by a real upstream status or by the fetch
+    ;; failing outward — both mean the request was NOT refused at the edge.
+    :forward (or threw? (and status (not= status 404)))))
+
+(defn- run-case [handler env {:keys [method url] :as c}]
+  (-> (.fetch handler (js/Request. url #js {:method method}) env)
+      (.then (fn [r] {:case c :status (.-status r) :threw? false}))
+      (.catch (fn [e] {:case c :status nil :threw? true :err (.-message e)}))))
+
+(defn- report [results]
+  (println "kouza edge guardrail — only com.etzhayyim.apps.kouza.* is forwarded")
+  (println (str/join "" (repeat 72 "-")))
+  (let [failures (atom [])]
+    (doseq [{:keys [case status threw? err]} results]
+      (let [ok? (verdict case status threw?)
+            observed (if threw? (str "threw: " (subs err 0 (min 28 (count err)))) status)]
+        (when-not ok? (swap! failures conj case))
+        (println (str (if ok? "  ok  " "  FAIL")
+                      "  " (:expect case)
+                      "\t" (:method case) " " (path-of (:url case))
+                      "\n\t\t-> " observed "   (" (:note case) ")"))))
+    (println (str/join "" (repeat 72 "-")))
+    (if (seq @failures)
+      (do (println "REFUSED TO PASS:" (count @failures) "case(s) did not behave as required")
+          (set! (.-exitCode js/process) 1))
+      (println "all" (count results) "cases behaved as required"))))
+
+(-> (js/import (str "file://" app-path))
+    (.then (fn [m]
+             (let [handler (.-default m)
+                   env #js {:APP_NANOID "k0uz401"}]
+               (-> (js/Promise.all (clj->js (map #(run-case handler env %) cases)))
+                   (.then (fn [rs] (report (vec rs))))))))
+    (.catch (fn [e]
+              ;; Refuse to report a pass we could not measure.
+              (println "could not load" app-path)
+              (println (.-message e))
+              (set! (.-exitCode js/process) 1))))
