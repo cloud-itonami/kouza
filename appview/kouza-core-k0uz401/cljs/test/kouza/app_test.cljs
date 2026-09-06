@@ -18,7 +18,7 @@
     (is (= 0 @(rf/subscribe [:route-count])))
     (is (= [] @(rf/subscribe [:routes])))
     (is (= [] @(rf/subscribe [:vars])))
-    (is (true? @(rf/subscribe [:xrpc?])))
+    (is (false? @(rf/subscribe [:xrpc?])))
     (is (= "appview/kouza-core-k0uz401/cljs/src/kouza/app.cljs"
            @(rf/subscribe [:relative-path])))))
 
