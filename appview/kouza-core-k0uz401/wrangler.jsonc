@@ -1,6 +1,5 @@
 {
   "name": "kouza-core-k0uz401",
-  "main": "svelte/.svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2025-03-17",
   "compatibility_flags": [
     "nodejs_compat",
@@ -11,7 +10,7 @@
     "APP_DISPLAY_NAME": "口座 kouza",
     "APP_DESCRIPTION": "Read-only financial account aggregator for external accounts and statement documents.",
     "APP_CAPABILITIES": "[\"bpmn-dispatch\",\"connection-registry\",\"statement-import\",\"account-documents\",\"kaikei-bank-transaction-candidates\"]",
-    "APP_FRAMEWORK": "sveltekit-edge-bff",
+    "APP_FRAMEWORK": "cljs-reagent-re-frame-jp-go-dds",
     "APP_PERFORMER_TYPE": "service",
     "APP_UI_TYPE": "appview",
     "AGENTGATEWAY_MCP_ROUTER_URL": "https://mcp.etzhayyim.com/xrpc/com.etzhayyim.mcp.message"
@@ -23,7 +22,7 @@
     }
   ],
   "assets": {
-    "directory": "./svelte/.svelte-kit/cloudflare/client",
+    "directory": "./cljs/public",
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "none"

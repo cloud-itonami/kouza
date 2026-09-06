@@ -6,8 +6,9 @@ face for external financial accounts** — bank, securities, card, custody — a
 for the statement documents those institutions issue.
 
 It is a **thin edge facade**. This repository holds the Cloudflare Worker and
-the SvelteKit appview that sit in front of the domain; it does not hold the
-aggregation logic. That lives outside this repo (see [Boundaries](#boundaries)).
+the ClojureScript (reagent + re-frame + jp-go-dds) appview that sit in front
+of the domain; it does not hold the aggregation logic. That lives outside
+this repo (see [Boundaries](#boundaries)).
 
 ## The guardrail is the point
 
@@ -29,16 +30,25 @@ Data handled here is classified `pii-tier3`.
 
 ```
 Request ──▶ appview/kouza-core-k0uz401/
-              ├── src/app.ts ............ Worker facade → dispatcher.etzhayyim.com
-              └── svelte/ ............... SvelteKit BFF  → mcp.etzhayyim.com (MCP router)
+              ├── src/app.ts ............................. Worker facade → dispatcher.etzhayyim.com
+              ├── src/xrpc-mcp-router-proxy.ts ............ preserved, NOT wired (see below)
+              └── cljs/ .................................. reagent + re-frame + jp-go-dds appview
 ```
 
-Two forward paths exist, to two different upstreams:
+One forward path is live today:
 
 | Path | Entry | Forwards to |
 |---|---|---|
 | Worker facade | `src/app.ts` | `DISPATCHER_URL` (default `dispatcher.etzhayyim.com`) |
-| SvelteKit BFF | `svelte/src/routes/xrpc/[...path]/+server.ts` | `AGENTGATEWAY_MCP_ROUTER_URL` (default `mcp.etzhayyim.com`) |
+
+`src/xrpc-mcp-router-proxy.ts` is the former SvelteKit BFF
+(`svelte/src/routes/xrpc/[...path]/+server.ts`) that forwarded to
+`AGENTGATEWAY_MCP_ROUTER_URL` (default `mcp.etzhayyim.com`). The SvelteKit
+frontend it shipped with was retired in the cljs migration (2026-09-07); the
+file was preserved byte-for-byte rather than deleted because it still imports
+from `@sveltejs/kit` and does not run as-is. Whether to re-wire it onto a
+plain Worker entry is left as an undecided product question — see the header
+comment in that file.
 
 Actor identity is `did:web:kouza.etzhayyim.com`, nanoid `k0uz401`.
 
