@@ -17,12 +17,26 @@ on 2026-05-21 and has a single commit.
 The extraction moved the **edge** and left the **logic** behind.
 `kotodama.jsonld` names what stayed in `etzhayyim/root`: the aggregation
 implementation (`…/kotodama/ingest/kouza.py`) and the process contracts
-(`00-contracts/bpmn/com/etzhayyim/kouza`). What arrived here is two proxies:
+(`00-contracts/bpmn/com/etzhayyim/kouza`). What arrived here originally was two
+proxies:
 
 | Entry | Forwards to |
 |---|---|
 | `appview/kouza-core-k0uz401/src/app.ts` (Worker) | `DISPATCHER_URL`, default `dispatcher.etzhayyim.com` |
 | `svelte/src/routes/xrpc/[...path]/+server.ts` (BFF) | `AGENTGATEWAY_MCP_ROUTER_URL`, default `mcp.etzhayyim.com` |
+
+**Update (2026-09-07):** the SvelteKit frontend that shipped alongside the
+BFF proxy was retired and replaced with a ClojureScript (reagent + re-frame +
+jp-go-dds) appview at `appview/kouza-core-k0uz401/cljs/`. The BFF proxy code
+itself was preserved byte-for-byte (not deleted) at
+`appview/kouza-core-k0uz401/src/xrpc-mcp-router-proxy.ts`, because it still
+imports from `@sveltejs/kit` and does not run as-is without the SvelteKit
+build. It is **not wired** into `wrangler.jsonc` today, so only one proxy is
+live:
+
+| Entry | Forwards to |
+|---|---|
+| `appview/kouza-core-k0uz401/src/app.ts` (Worker) | `DISPATCHER_URL`, default `dispatcher.etzhayyim.com` |
 
 This creates a documentation hazard that motivated this ADR. A reader landing
 here sees a financial application and reasonably assumes the repository governs

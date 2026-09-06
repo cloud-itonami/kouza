@@ -81,16 +81,21 @@ Not in this repository. `kotodama.jsonld` names both locations, in
 - aggregation — `40-engine/kotoba/crates/kotoba-kotodama/py/src/kotodama/ingest/kouza.py`
 - process contracts — `00-contracts/bpmn/com/etzhayyim/kouza`
 
-This repo is the edge: `src/app.ts` (Worker → dispatcher) and
-`svelte/src/routes/xrpc/[...path]/+server.ts` (SvelteKit BFF → MCP router).
+This repo is the edge: `src/app.ts` (Worker → dispatcher). The former
+SvelteKit BFF → MCP router path (`svelte/src/routes/xrpc/[...path]/+server.ts`)
+was preserved, unwired, at `src/xrpc-mcp-router-proxy.ts` when the frontend
+was migrated off SvelteKit (2026-09-07); it does not run as-is (imports from
+`@sveltejs/kit`) and is not part of any active forward path.
 
 ## Deploying
 
 Do not deploy without restoring the upstreams first — a live facade in front of
 absent upstreams returns failures to real callers under a financial identity.
 The Worker is configured in `appview/kouza-core-k0uz401/wrangler.jsonc`, routed
-at `kouza.etzhayyim.com/*`; the SvelteKit build must exist at
-`svelte/.svelte-kit/cloudflare/` before `wrangler deploy` will succeed.
+at `kouza.etzhayyim.com/*`; static assets are served from
+`cljs/public` (built by `cd cljs && npm run release`) — **this asset/main
+wiring is UNVERIFIED by an actual `wrangler deploy`; verifying the deploy is
+separate follow-up work.**
 
 ## Constraints
 
