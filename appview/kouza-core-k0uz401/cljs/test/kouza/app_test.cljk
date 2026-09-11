@@ -19,7 +19,7 @@
     (is (= [] @(rf/subscribe [:routes])))
     (is (= [] @(rf/subscribe [:vars])))
     (is (false? @(rf/subscribe [:xrpc?])))
-    (is (= "appview/kouza-core-k0uz401/cljs/src/kouza/app.cljs"
+    (is (= "appview/kouza-core-k0uz401/cljs/src/kouza/app.cljk"
            @(rf/subscribe [:relative-path])))))
 
 (deftest title-sub-reflects-db

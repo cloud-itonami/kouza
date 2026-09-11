@@ -70,7 +70,7 @@
    :routes []
    :vars []
    :xrpc? false
-   :relative-path "appview/kouza-core-k0uz401/cljs/src/kouza/app.cljs"})
+   :relative-path "appview/kouza-core-k0uz401/cljs/src/kouza/app.cljk"})
 
 (rf/reg-event-db
  :initialize-db

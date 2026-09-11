@@ -6,7 +6,7 @@
 ;; is only asserted in prose is not a boundary, so this exercises the real
 ;; module and prints what it actually answered.
 ;;
-;;   nbb scripts/probe-guardrail.cljs
+;;   nbb scripts/probe-guardrail.cljk
 ;;
 ;; Exits 1 if any refusal case was NOT refused. Requires Node >= 22 (imports the
 ;; TypeScript module directly via native type stripping); no install step.
