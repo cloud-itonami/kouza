@@ -57,7 +57,7 @@ kouza reads accounts. It must never move money. The edge enforces this by
 forwarding **only** `com.etzhayyim.apps.kouza.*` and refusing everything else:
 
 ```bash
-nbb scripts/probe-guardrail.cljk
+kbb --backend sci scripts/probe-guardrail.cljk
 ```
 
 Expect **exit 0** and five `ok` lines. The two that matter are the refusals of
@@ -69,7 +69,7 @@ fail, widen the prefix in `appview/kouza-core-k0uz401/src/app.ts`:
 
 ```bash
 # NSID_PREFIX = "com.etzhayyim.apps.kouza."   ->   "com."
-nbb scripts/probe-guardrail.cljk   # now: 2 FAIL, exit 1
+kbb --backend sci scripts/probe-guardrail.cljk   # now: 2 FAIL, exit 1
 git checkout appview/kouza-core-k0uz401/src/app.ts
 ```
 
