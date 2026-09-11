@@ -21,7 +21,7 @@ response), `kotodama.jsonld` (`convoSystemPrompt`, `complianceFrameworks`), and
 the lexicon prefix the facade will forward. The edge enforces the last one
 mechanically: it forwards **only** `com.etzhayyim.apps.kouza.*` and answers
 `404` to everything else, including transfer- and withdrawal-shaped methods
-belonging to sibling apps. `scripts/probe-guardrail.cljs` demonstrates this
+belonging to sibling apps. `scripts/probe-guardrail.cljk` demonstrates this
 against the real module; see the [operator quickstart](docs/operator-quickstart.md).
 
 Data handled here is classified `pii-tier3`.

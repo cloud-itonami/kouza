@@ -65,7 +65,7 @@ methods belonging to sibling apps — notably `com.etzhayyim.apps.kaikei.*`
 (会計, accounting), for which kouza produces *candidates* and never postings.
 
 **3. That invariant is demonstrated, not asserted.**
-`scripts/probe-guardrail.cljs` imports the real module and exercises five
+`scripts/probe-guardrail.cljk` imports the real module and exercises five
 requests, including `kaikei.transfer` and a foreign `evil.withdraw`. It exits 1
 if any refusal case is not refused. It was verified to discriminate: widening
 `NSID_PREFIX` to `com.` makes exactly those two cases fail and the script exit
